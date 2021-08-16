@@ -8,6 +8,8 @@ class Seach extends React.Component{
 
     constructor(props){
         super(props)
+        this.page = 0
+        this.totalPage = 0
         this.state = { 
             films: [],  
             isLoading: false
@@ -18,7 +20,9 @@ class Seach extends React.Component{
     _loadFilms() {
         this.setState({ isLoading: true})
         if (this.searchedText.length > 0){
-            getFilmsFromApiWithSearchedText(this.searchedText).then(data =>
+            getFilmsFromApiWithSearchedText(this.searchedText, this.page+1).then(data =>
+                this.page = data.page,
+                this.totalPage = data.total_pages,
                 this.setState({
                     films: data.results,
                     isLoading: false
