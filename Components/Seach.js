@@ -9,7 +9,7 @@ class Seach extends React.Component{
     constructor(props){
         super(props)
         this.page = 0
-        this.totalPage = 0
+        this.totalPages = 0
         this.state = { 
             films: [],  
             isLoading: false
@@ -18,16 +18,16 @@ class Seach extends React.Component{
     }
 
     _loadFilms() {
-        this.setState({ isLoading: true})
-        if (this.searchedText.length > 0){
-            getFilmsFromApiWithSearchedText(this.searchedText, this.page+1).then(data =>
-                this.page = data.page,
-                this.totalPage = data.total_pages,
+        if (this.searchedText.length > 0) {
+            this.setState({ isLoading: true})//lancement du chargement
+            getFilmsFromApiWithSearchedText(this.searchedText, this.page+1).then(data => {
+                this.page = data.page
+                this.totalPages = data.total_pages
                 this.setState({
-                    films: data.results,
+                    films: [ ...this.state.films, ...data.results ],// equivaut à : this.state.films.concat(data.results)
                     isLoading: false
                 })
-            )
+            })
         }
     }
 
@@ -57,7 +57,14 @@ class Seach extends React.Component{
                     keyExtractor={(item) => item.id.toString()}
                     onEndReachedThreshold={0.5}//
                     onEndReached={() => {
-                        console.log('onEndReached')
+                        if ( this.page < this.totalPages ) {
+                            this._loadFilms()
+                           
+                            console.log('TEST IF')
+                        }
+                        console.log('onEndReached') 
+                        console.log(this.page)
+                        console.log(this.totalPages)
                     }}
                     renderItem={({item}) => <FilmItem film={item}/>}//le rendu
                 />
