@@ -20,20 +20,18 @@ class Search extends React.Component{
     _loadFilms() {
         if (this.searchedText.length > 0) {
             this.setState({ isLoading: true})//lancement du chargement
-            console.log("avant-------------------------------"+this.page)
             getFilmsFromApiWithSearchedText(this.searchedText, this.page+1).then(data => { //fonction peut etre longue a executer !!!
                 this.page = data.page
-                console.log("data-------------------------------"+data.page)
                 this.totalPages = data.total_pages
                 this.setState({
-                    films: [ ...this.state.films, ...data.results ],// equivaut à : this.state.films.concat(data.results)
+                    films: [ ...this.state.films, ...data.results ],// equivaut à : this.state.films.concat(data.results) //(ES6)
                     isLoading: false
                 })
             })
         }
     }
 
-    _displayLoading() {
+    _displayLoading() { // un cercle de chargement
         if (this.state.isLoading) {
             return (
                 <View style={styles.loading_container}>
@@ -60,10 +58,14 @@ class Search extends React.Component{
         this.searchedText = text
     }
 
+    _displayDetailForFilm = (idFilm) => {
+        this.props.navigation.navigate("FilmDetail", { idFilm: idFilm })
+    }
+
     render(){
         console.log(this.state.isLoading)
         return (
-            <View style={{marginTop: 40, justifyContent: 'center', flex: 1}}>
+            <View style={{ justifyContent: 'center', flex: 1}}>
                 <TextInput onSubmitEditing={() => this._searchFilms()} onChangeText={(text) => this._searchTextInputChanged(text)} placeholder="Titre du film" style={styles.Textinput}></TextInput>
                 <Button title="Rechercher" onPress={() => this._searchFilms()} style={{ height: 50 }}></Button> 
                 <FlatList
@@ -75,7 +77,7 @@ class Search extends React.Component{
                             this._loadFilms()
                         }
                     }}
-                    renderItem={({item}) => <FilmItem film={item}/>}//le rendu
+                    renderItem={({item}) => <FilmItem film={item} displayDetailForFilm={this._displayDetailForFilm} />}//le rendu
                 />
                 {this._displayLoading()}
             </View>
