@@ -1,8 +1,9 @@
 import React from 'react'
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Image } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Image, Button } from 'react-native'
 import { getFilmDetailFromApi, getImageFromApi } from '../API/TMDBApi'
 import moment from 'moment'
 import numeral from 'numeral'
+import { connect } from 'react-redux'
 
 class FilmDetail extends React.Component{
 
@@ -23,6 +24,18 @@ class FilmDetail extends React.Component{
         })
     }
 
+    _toggleFavorite() {
+        const action = { type: "TOGGLE_FAVORITE", value: this.state.film }
+        this.props.dispatch(action)
+        console.log('test')
+        console.log(this.props.favoritesFilm);
+    }
+
+    componentDidUpdate() {
+        console.log('componentDidUpdate');
+        console.log(this.props.favoritesFilm);
+    }
+
     _displayFilm() {
         const film = this.state.film
         if(film != undefined) { //pour attendre car si on lance l'appli ca va crache car le film est pas encore récupéré
@@ -30,6 +43,7 @@ class FilmDetail extends React.Component{
                 <ScrollView style={styles.scrollview_container}>
                     <Image style={styles.image} source={{uri: getImageFromApi(film.backdrop_path)}} />
                     <Text style={styles.title}>{film.title}</Text>
+                    <Button title="Favoris" onPress={() => this._toggleFavorite()} />
                     <View style={styles.view_main}>
                         <Text style={styles.description_text}>{film.overview}</Text>
                         <View style={styles.view_footer}>
@@ -124,4 +138,11 @@ const styles = StyleSheet.create({
     }
 })
 
-export default FilmDetail
+const mapStateToProps = (state) => {
+    console.log('map')
+    return {
+        favoritesFilm: state.favoritesFilm
+    }
+}
+
+export default connect(mapStateToProps)(FilmDetail)
